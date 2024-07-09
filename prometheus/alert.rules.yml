@@ -1,0 +1,111 @@
+groups:
+  - name: example
+    rules:
+      - alert: HTTPStatusCodeChange
+        expr: changes(probe_http_status_code{instance="https://lms.skillfactory.ru"}[5m]) != 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HTTP Status Code change for lms.skillfactory.ru"
+          description: "The HTTP status code for lms.skillfactory.ru has changed."
+
+      - alert: HTTPProbeDurationExceedsThreshold
+        expr: probe_duration_seconds{instance="https://lms.skillfactory.ru"} > 5
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "HTTP Probe duration exceeds threshold for lms.skillfactory.ru"
+          description: "The HTTP probe duration for lms.skillfactory.ru exceeds 5 seconds."
+
+      - alert: ServerRestart
+        expr: changes(node_boot_time_seconds[1m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Server has restarted"
+          description: "The server has restarted recently."
+
+      - alert: HTTPProbeFailing
+        expr: probe_success{instance="https://lms.skillfactory.ru"} == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HTTP probe is failing for lms.skillfactory.ru"
+          description: "The HTTP probe for lms.skillfactory.ru is failing."
+
+      - alert: DNSLookupTimeout
+        expr: probe_dns_lookup_time_seconds{instance="https://lms.skillfactory.ru"} > 5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "DNS lookup timeout for lms.skillfactory.ru"
+          description: "The DNS lookup for lms.skillfactory.ru took more than 5 seconds."
+
+      - alert: HTTPSSLExpiry
+        expr: probe_ssl_earliest_cert_expiry{instance="https://lms.skillfactory.ru"} < time() + 2592000
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SSL certificate expiry for lms.skillfactory.ru"
+          description: "The SSL certificate for lms.skillfactory.ru will expire soon (within 30 days)."
+
+      - alert: HTTPContentLengthChange
+        expr: changes(probe_http_content_length{instance="https://lms.skillfactory.ru"}[5m]) != 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HTTP content length change for lms.skillfactory.ru"
+          description: "The HTTP content length for lms.skillfactory.ru has changed."
+
+      - alert: BlackboxProbeFailure
+        expr: probe_success{job="blackbox"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Blackbox probe failed"
+          description: "The Blackbox probe has failed."
+
+      - alert: HighCPUUsage
+        expr: node_load1 > 0.7
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU load average is above 0.7 on the node."
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemFree_bytes) / node_memory_MemTotal_bytes > 0.8
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 80% on the node."
+
+      - alert: DiskSpaceExhausted
+        expr: (node_filesystem_free_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk space exhausted"
+          description: "Free disk space on the root filesystem is below 10%."
+
+      - alert: NetworkInterfaceDown
+        expr: absent(up{job="node"} == 1)
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Network interface down"
+          description: "A network interface on the node is down."
+
